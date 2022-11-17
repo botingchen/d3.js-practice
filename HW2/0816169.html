@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HW02-Parallel Coordinates chart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.1.1/d3.min.js" integrity="sha512-5xkNvFVCctXwOszeifE8pzjyDFlHvHDCKIrhwmuSbCtTHqc7IhA6/1tTNYXE8WmYvwP5KFQegCS1QRR4poYgjg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha512-M5KW3ztuIICmVIhjSqXe01oV2bpe248gOxqmlcYrEzAvws7Pw3z6BK0iGbrwvdrUQUhi3eXgtxp5I8PDo9YfjQ==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous" />
+  </head>
+  <style type="text/css">
+    body {
+      margin: 0px;
+      padding-bottom: 50px;
+      overflow: hidden;
+      overflow-y: auto;
+    }
+
+    .portlet-container {
+      min-height: 60px;
+    }
+    .portlet-container-desc {
+      width: 95px;
+      min-height: 60px;
+      line-height: 30px;
+      padding: .75rem .1rem;
+      text-align: center;
+    }
+    .portlet {
+      width: 95px;
+      height: 50px;
+      border-radius: .25rem;
+      padding: .75rem .1rem;
+      margin: .15rem;
+      background-color: rgba(0,0,0,.03);
+      border: 1px solid rgba(0,0,0,.125);
+      text-align: center;
+    }
+    .portlet-placeholder {
+      border: 1px dotted black;
+      border-radius: .25rem;
+      margin: .15rem;
+      width: 95px;
+      height: 50px;
+    }
+    .yAxis-label {
+      text-anchor: middle;
+      font-size: 20px;
+    }
+    .tick {
+      font-size: 1.7em;
+    }
+    .connection {
+      fill: none;
+    }
+    .Iris-setosa {
+      stroke: #FFC0Cb;
+    }
+    .Iris-versicolor {
+      stroke: #3CB371;
+    }
+    .Iris-virginica {
+      stroke: #00BFFF;
+    }
+
+    @media (min-width: 768px) {
+      .portlet-container {
+        min-height: 600px;
+      }
+    }
+
+    .legend-container {
+      cursor: pointer;
+      min-height: 55px;
+      margin-left: 0.1rem;
+      
+    }
+
+    .dot-border {
+      height: 25px;
+      width: 25px;
+      background-color: transparent;
+      display: block;
+      margin-right: 0.25rem;
+    }
+
+    .dot {
+      position: relative;
+      height: 15px;
+      width: 15px;
+      display: block;
+      left: 5px;
+      top: -20px;
+    }
+    .Iris-setosa>.dot {
+      background-color: #FFC0Cb;
+    }
+    .Iris-versicolor>.dot {
+      background-color: #3CB371;
+    }
+    .Iris-virginica>.dot {
+      background-color: #00BFFF;
+    }
+    .Iris-setosa>.dot-border {
+      border: 4px #FFC0Cb solid;
+    }
+    .Iris-versicolor>.dot-border {
+      border: 4px #3CB371 solid;
+    }
+    .Iris-virginica>.dot-border {
+      border: 4px #00BFFF solid;
+    }
+    .Iris-setosa.hidden {
+      stroke: none;
+    }
+    .Iris-versicolor.hidden {
+      stroke: none; 
+    }
+    .Iris-virginica.hidden {
+      stroke: none;
+    }
+    .dot.hidden {
+      background-color: transparent;
+    }
+
+  </style>
+  <body>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 col-md-2 col-xl-1" style="border-right: 1px lightgray dashed">
+          <div class="d-flex flex-row flex-md-column flex-wrap align-content-center">
+            <div class="portlet-container-desc">Drag it!</div>
+            <div id="axes-order" class="portlet-container d-flex flex-row flex-md-column flex-wrap align-content-center">
+              <div class="portlet" data-axis="sepal length">sepal length</div>
+              <div class="portlet" data-axis="sepal width">sepal width</div>
+              <div class="portlet" data-axis="petal length">petal length</div>
+              <div class="portlet" data-axis="petal width">petal width</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-2 col-xl-1" style="border-right: 1px lightgray dashed">
+          <div class="d-flex flex-row flex-md-column flex-wrap align-content-center">
+            <div class="portlet-container-desc">Click it!</div>
+            <div class="row">
+              <div class="legend-container  d-flex flex-row flex-wrap" data-species="Iris-setosa">
+                <div class="dot-container Iris-setosa"><span class="dot-border"></span><span class="dot"></span></div>
+                <span class="legend">Iris-setosa</span>
+              </div>
+              <div class="legend-container d-flex flex-row flex-wrap" data-species="Iris-versicolor">
+                <div class="dot-container Iris-versicolor "><span class="dot-border"></span><span class="dot"></span></div>
+                <span class="legend">Iris-versicolor</span>
+              </div>
+              <div class="legend-container d-flex flex-row flex-wrap" data-species="Iris-virginica">
+                <div class="dot-container Iris-virginica"><span class="dot-border"></span><span class="dot"></span></div>
+                <span class="legend">Iris-virginica</span>
+              </div>
+            </div>            
+          </div>
+
+        </div>      
+        <div class="col-12 col-md-8 col-xl-10">
+            <div id="chart" class="col-12"></div>
+        </div>
+    </div>
+    <script>
+      var data;
+      
+      $(document).ready(function() {
+        const render = (data, axes) => {
+          var margin = {top: 60, right: 10, bottom: 10, left: 0},
+          width = 1200 - margin.left - margin.right,
+          height = 700 - margin.top - margin.bottom;
+          const innerWidth = width - margin.left - margin.right;
+          const innerHeight = height - margin.top - margin.bottom;
+
+          d3.select("#chart svg").remove();
+          const svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+          const graphContainer = svg.append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+          const yAxes = {};
+          for (obj in axes) {
+            name = axes[obj];
+            yAxes[name] = d3.scaleLinear()
+              .domain([8,0]).nice()
+              .range([0, innerHeight]);
+          }
+          // console.log(yAxes['sepal length'])
+
+          const xAxes = d3.scalePoint()
+            .range([20,innerWidth])
+            .padding(0.4)
+            .domain(axes);
+
+
+          const connection = d => d3.line()(axes.map(pt => [xAxes(pt),yAxes[pt](d[pt])]));
+
+          // Draw the connections
+          graphContainer.selectAll('connections')
+            .data(data)
+            .enter().append('path')
+            .attr('d',  connection)
+            .attr('class', d => d.class)
+            .attr('class', d => 'connection '+d.class);
+
+          // Draw the axes:
+          graphContainer.selectAll("axes")
+            .data(axes).enter()
+            .append("g")
+            .attr("transform", function(d) { return "translate(" + xAxes(d) + ",0)"; })
+            .each(function(d) { d3.select(this).transition().duration(1000).call(d3.axisLeft().scale(yAxes[d])); })
+            .append("text").style("text-anchor", "middle").style("font", "20px times")
+            .attr("y", -20)
+            .text(d => d)
+            .style("fill", "black");
+        }
+
+        d3.csv('http://vis.lab.djosix.com:2020/data/iris.csv').then(csv => {
+          for (var i = csv.length - 1; i >= 0; i--) {
+            if(csv[i].class === "") {
+              csv.splice(i, 1);
+            }
+          }
+          let axes = Object.keys(csv[0]).filter(d => d!='class');
+          render(csv, axes);
+          data = csv
+        });
+
+        $( ".portlet-container" ).sortable({ 
+          connectWith: ".portlet-container",
+          placeholder: "portlet-placeholder",
+          update: function(event, ui) {
+            if(event.target.id == 'axes-order') {
+              let axes = [];
+              $('#axes-order').children('.portlet').each((idx, elem) => {
+                axes.push($(elem).data('axis'));
+              });
+              render(data, axes);
+              $('.legend-container .dot').each((idx, elem) => {
+                if($(elem).hasClass('hidden')) {
+                  $('#chart svg').find('.'+$(elem).parent().parent().data('species')).toggleClass('hidden');
+                }
+              });
+            }
+          },
+        });
+        $(".legend-container").on('click', function(event) {
+          $(this).find('.dot').toggleClass('hidden');
+          $('#chart svg').find('.'+$(this).data('species')).toggleClass('hidden');
+        });
+        window.addEventListener('resize', () => { 
+          let axes = [];
+          $('#axes-order').children('.portlet').each((idx, elem) => {
+            axes.push($(elem).data('axis'));
+          });
+          render(data, axes);
+          $('.legend-container .dot').each((idx, elem) => {
+            if($(elem).hasClass('hidden')) {
+              $('#chart svg').find('.'+$(elem).parent().parent().data('species')).toggleClass('hidden');
+            }
+          });
+        });
+      })
+      
+    </script> 
+  </body>
+</html>

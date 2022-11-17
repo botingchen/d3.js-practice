@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Iris Dataset Scatter Plot with D3.js</title>
+    <style>
+      .tick text {
+        font-size: 24px;
+      }
+      select {
+            width: 500px;
+            height: 40px;
+            margin: 20px;
+            font-size: 24px;
+        }
+    </style>
+
+    <script src="https://unpkg.com/d3@6.7.0/dist/d3.min.js"></script>
+  </head>
+  <body>
+    <div style="text-align:center">
+      <div style = "display: inline-block;">
+        <font size="5">X:</font>
+        <select id = "myList" onchange = "update_x()" >  
+        <option value="sepal length"> sepal length </option>  
+        <option value="sepal width"> sepal width </option>  
+        <option value="petal length"> petal length </option>  
+        <option value="petal width"> petal width </option>  
+        </select>
+      </div>
+      <div style = "display: inline-block;" >
+        <font size="5">Y:</font>
+        <select id = "myList2" onchange = "update_y()" text-align: center>  
+        <option value="sepal length"> sepal length </option>  
+        <option value="sepal width"> sepal width </option>  
+        <option value="petal length"> petal length </option>  
+        <option value="petal width"> petal width </option>            
+      </div>
+      </select>          
+    </div>
+    <script>
+      let x_axis_feature='sepal length'
+      let y_axis_feature='sepal length'
+      const {csv, select, scaleLinear, extent, axisLeft, axisBottom, } = d3;
+      const csvUrl = 'http://vis.lab.djosix.com:2020/data/iris.csv'
+      const parseRow = (d) => {
+        d['sepal length'] = +d['sepal length'];
+        d['sepal width'] = +d['sepal width'];
+        d['petal length'] = +d['petal length'];
+        d['petal width'] = +d['petal width'];
+        return d;
+      };  //LOAD THE DATA
+      xValue = (d) => d[x_axis_feature];
+      yValue = (d) => d[y_axis_feature];
+      const speciesValue = (d) => d['class'];
+      const margin = {
+        top: 20,
+        right: 50,
+        bottom: 80,
+        left: 400,
+      };
+      const radius = 10
+      const width = 1200;
+      const height = 600;
+      const svg = select('body')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+      async function initAxis(){
+        window.data = await csv(csvUrl, parseRow);
+        // console.log(data)
+        data = data.slice(0, data.length - 1);
+        //xy scaling
+        window.xscale = scaleLinear().domain(extent(data, xValue)).range([margin.left, width - margin.right]).nice();
+        window.yscale = scaleLinear().domain(extent(data, yValue)).range([height - margin.bottom, margin.top]).nice();  
+        
+        // class color selection
+        const marker = (d) => {
+            switch(d){
+              case 'Iris-setosa':
+                return '#00cc00';
+              case 'Iris-versicolor':
+                return '#ff0066';
+              case 'Iris-virginica':
+                return '#1ab2ff';
+            }
+        }
+          
+        const marks = data.map((d) => ({
+            x: xValue(d),
+            y: yValue(d),
+            species: speciesValue(d),
+            color: marker(speciesValue(d)),         
+        }));
+          // var formatPercent = d3.format('.2%')
+          svg
+            .selectAll('circle')
+            .data(marks)
+            .join('circle')
+            .attr('cx', (d) => xscale(d.x))
+            .attr('cy', (d) => yscale(d.y))
+            .attr('fill', (d) => d.color)
+            .attr('r', radius)
+            .style("opacity", 0.7) 
+            .on('mouseover', function (d, i) {
+                d3.select(this).attr("r", 15).append('title').interrupt("fadeOut")
+                .text(function (d) { return d.species +
+							        '\nX: ' + d.x +
+							        '\nY: ' + d.y });
+            })
+            .on('mouseout', function (d, i) {
+                d3.selectAll('title').remove().transition("fadeOut")
+                d3.select(this).attr("r", radius);
+            })
+             // Tooltip
+		        
+
+          var y_axis = d3.axisLeft(yscale)
+          .tickSize(-innerWidth + 785).tickPadding(15)
+          .scale(yscale)
+
+          svg.append('g').attr('class','yaxis')
+            .attr('transform', `translate(${margin.left},0)`)
+            .call(y_axis);
+          
+          svg.append('text')
+            .attr('class', 'yaxis-label')
+            .attr('x', -250)
+            .attr('y', 300)
+            .attr('fill', 'black')
+            .style("font", "25px times")
+            .style('text-anchor', 'middle')
+            .attr('transform', `rotate(-90)`)
+            .text(y_axis_feature);
+
+          var x_axis = d3.axisBottom(xscale)
+          .tickSize(-innerWidth+1035).tickPadding(15);
+          // .scale(xscale)
+          svg.append('g').attr('class','xaxis')
+            .attr('transform',`translate(0,${height - margin.bottom})`)
+            .call(x_axis);
+          
+          svg.append('text')
+            .attr('class', 'xaxis-label')
+            .attr('x', 750)
+            .attr('y', 590)
+            .attr('fill', 'black')
+            .style("font", "25px times")
+            .style('text-anchor', 'middle')
+            .text(x_axis_feature);
+          
+      };
+      async function update_x(){
+        
+        var mylist = document.getElementById("myList");  
+	      x_axis_feature = mylist.options[mylist.selectedIndex].text;
+        
+        xValue = (d) => d[x_axis_feature];
+        yValue = (d) => d[y_axis_feature];
+        //xy rescaling
+        console.log(extent(data, xValue))
+        xscale.domain(extent(data, xValue)).nice();
+
+        //update axis
+        svg.selectAll("g.xaxis")
+          .transition().duration(1000)
+          .call(d3.axisBottom(xscale).tickSize(-innerWidth+1035).tickPadding(15));
+        svg.selectAll("text.xaxis-label")
+          .transition().duration(2000)
+          .text(x_axis_feature);
+
+        //update element
+
+        
+        const marker = (d) => {
+            switch(d){
+              case 'Iris-setosa':
+                return '#00cc00';
+              case 'Iris-versicolor':
+                return '#ff0066';
+              case 'Iris-virginica':
+                return '#1ab2ff';
+            }
+        }
+          
+        const marks = data.map((d) => ({
+            x: xValue(d),
+            y: yValue(d),
+            species: speciesValue(d),
+            color: marker(speciesValue(d)),         
+        }));        
+
+        let circle = d3.select("svg").selectAll("circle");
+        let update = circle.data(marks);
+        let enter = update.enter();
+        let exit = update.exit();
+
+        exit.remove();
+        update.transition().duration(1000).attr("cx", (d) => xscale(d.x)) 
+          .attr("cy", (d) => yscale(d.y))
+          .attr("r", radius)
+          .attr("fill", (d) => d.color)
+        update.on('mouseover', function (d, i) {    		        
+                d3.select(this).attr("r", 15).append('title').interrupt("fadeOut").text(function (d) { return d.species +
+							 '\nX: ' + d.x +
+							 '\nY: ' + d.y });
+            })
+            .on('mouseout', function (d, i) {
+                d3.selectAll('title').remove().transition("fadeOut")
+                d3.select(this).attr("r", radius);
+            })
+        enter.append('circle').transition().duration(1000).attr("cx", (d) => xscale(d.x)) 
+          .attr("cy", (d) => yscale(d.y))
+          .attr("r", radius)
+          .attr("fill", (d) => d.color)
+        enter.on('mouseover', function (d, i) {
+                d3.select(this).attr("r", 15).append('title').interrupt("fadeOut").text(function (d) { return d.species +
+							 '\nX: ' + d.x +
+							 '\nY: ' + d.y });
+            })
+            .on('mouseout', function (d, i) {
+                d3.selectAll('title').remove().transition("fadeOut")
+                d3.select(this)
+                      .attr("r", radius);
+            })
+
+      }
+      async function update_y(){
+        var mylist2 = document.getElementById("myList2");  
+	      y_axis_feature = mylist2.options[mylist2.selectedIndex].text;
+        
+        yValue = (d) => d[y_axis_feature];
+        //xy scaling
+        yscale.domain(extent(data, yValue)).nice();
+        svg.selectAll("g.yaxis")
+          .transition().duration(1000)
+          .call(d3.axisLeft(yscale).tickSize(-innerWidth + 785).tickPadding(15));
+        svg.selectAll("text.yaxis-label")
+          .transition().duration(2000)
+          .text(y_axis_feature);
+        const marker = (d) => {
+            switch(d){
+              case 'Iris-setosa':
+                return '#00cc00';
+              case 'Iris-versicolor':
+                return '#ff0066';
+              case 'Iris-virginica':
+                return '#1ab2ff';
+            }
+        }
+          
+        const marks = data.map((d) => ({
+            x: xValue(d),
+            y: yValue(d),
+            species: speciesValue(d),
+            color: marker(speciesValue(d)),         
+        }));        
+
+        let circle = d3.select("svg").selectAll("circle");
+        let update = circle.data(marks);
+        let enter = update.enter();
+        let exit = update.exit();
+
+        exit.remove();
+        update.transition().duration(1000).attr("cx", (d) => xscale(d.x)) 
+          .attr("cy", (d) => yscale(d.y))
+          .attr("r", radius)
+          .attr("fill", (d) => d.color)
+        update.on('mouseover', function (d, i) {    		        
+                d3.select(this).attr("r", 15).append('title').interrupt("fadeOut").text(function (d) { return d.species +
+							 '\nX: ' + d.x +
+							 '\nY: ' + d.y });
+            })
+            .on('mouseout', function (d, i) {
+                d3.selectAll('title').remove().transition("fadeOut")
+                d3.select(this).attr("r", radius);
+            })
+        enter.append('circle').transition().duration(1000).attr("cx", (d) => xscale(d.x)) 
+          .attr("cy", (d) => yscale(d.y))
+          .attr("r", radius)
+          .attr("fill", (d) => d.color)
+        enter.on('mouseover', function (d, i) {
+                d3.select(this).attr("r", 15).append('title').interrupt("fadeOut").text(function (d) { return d.species +
+							 '\nX: ' + d.x +
+							 '\nY: ' + d.y });
+            })
+            .on('mouseout', function (d, i) {
+                d3.selectAll('title').remove().transition("fadeOut")
+                d3.select(this)
+                      .attr("r", radius);
+            })
+      }
+      initAxis();
+    </script>
+  </body>
+</html>
