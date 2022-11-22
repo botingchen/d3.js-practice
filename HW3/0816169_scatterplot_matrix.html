@@ -1,12 +1,42 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-  <title>Circular Barplot</title>
+  <title>Scatterplot Matrix</title>
   <!-- Load d3.js -->
   <script src="https://d3js.org/d3.v4.js"></script>
 
   <!-- Function for radial charts -->
   <style>
+    body 
+    {
+      height: 125vh;
+      margin-top: 80px;
+      padding: 30px;
+      background-size: cover;
+      font-family: sans-serif;
+    }
+    
+    header {
+      background-color: orange;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 5px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 0 25px 0 black;
+    }
+    header * {
+    display: inline;
+    }
+    header li {
+    margin: 20px;
+    }
+    header li a {
+    color: blue;
+    text-decoration: none;
+    }
 
   svg {
     font: 10px sans-serif;
@@ -54,6 +84,27 @@
   </style>
 </head>
 <body>
+  <header>
+    <nav>
+    <ul>
+    <li>
+      <a href="0816169.html"> Home </a>
+    </li>
+    <li>
+    <a href="0816169_scatter_plot.html"> Scatter Plot </a>
+    </li>
+    <li>
+    <a href="0816169_density_plot.html"> Density Plot </a>
+    </li>
+    <li>
+    <a href="0816169_scatterplot_matrix.html"> Scatter Plot Matrix</a>
+    </li>
+    <li>
+    <a href="0816169_circular_bar.html"> Circular Barplot </a>
+    </li>
+    </ul>
+    </nav>
+  </header>
   <div id="dropdown_container"></div>
   <script>
   const render = (traits, domainByTrait, data) => {

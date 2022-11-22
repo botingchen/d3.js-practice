@@ -50,7 +50,7 @@
         <a href="scatter_plot.html"> Scatter Plot </a>
         </li>
         <li>
-        <a href="histogram.html"> Histogram </a>
+        <a href="density_plot.html"> Density Plot </a>
         </li>
         <li>
         <a href="scatterplot_matrix.html"> Scatter Plot Matrix</a>
@@ -106,7 +106,7 @@
     var x = d3.scaleBand().padding(-1)
           .range([0, 2 * Math.PI])    // X axis goes from 0 to 2pi = all around the circle. If I stop at 1Pi, it will be around a half circle
           .align(0)                  // This does nothing ?
-          .domain( avg_result.map(function(d) { return d.track_genre; }) ); // The domain of the X axis is the list of states.
+          .domain( avg_result.map(function(d) { return d["track_genre"]; }) ); // The domain of the X axis is the list of states.
     
     // Y scale
     var y = d3.scaleRadial()
@@ -179,6 +179,7 @@
       }
       avg_list.push(total/1000);
       avg_result.push({"track_genre":temp_genre, "avg":total/1000});
+      avg_result.sort((a,b) => a.avg - b.avg);
       render(avg_list, avg_result)
     });
   }
@@ -204,6 +205,8 @@
       }
       avg_list.push(total/1000);
       avg_result.push({"track_genre":temp_genre, "avg":total/1000});
+      avg_result.sort((a,b) => a.avg - b.avg); // b - a for reverse sort
+      // console.log(avg_result);avg_result.sort((a,b) => a.avg - b.avg);
       render(avg_list, avg_result)
     });
 </script>
