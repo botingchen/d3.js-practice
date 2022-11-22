@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HW01-Iris</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    body 
+    {
+      height: 125vh;
+      margin-top: 80px;
+      padding: 30px;
+      background-size: cover;
+      font-family: sans-serif;
+    }
+    
+    header {
+      background-color: orange;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 5px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 0 25px 0 black;
+    }
+    header * {
+    display: inline;
+    }
+    header li {
+    margin: 20px;
+    }
+    header li a {
+    color: blue;
+    text-decoration: none;
+    }
+
+      circle {
+        fill: red;
+        opacity: 0.3;
+      }
+
+      .Iris-versicolor {
+        background-color: #ff7f0e;
+        opacity: 0.5;
+        fill: #ff7f0e;
+      }
+
+      .Iris-virginica {
+        background-color: #2ca02c;
+        opacity: 0.5;
+        fill: #2ca02c;
+      }
+
+      .Iris-setosa {
+        background-color: #1f77b4;
+        opacity: 0.5;
+        fill: #1f77b4;
+      }
+
+      text {
+        font-family: sans-serif;
+      }
+
+      .tick text {
+        font-size: 2.7em;
+        fill: #635F5D;
+      }
+
+      .tick line {
+        stroke: #C0C0BB;
+      }
+
+      .axis-label {
+        font-size: 5em;
+        fill: #8E8883;
+      }
+
+      .title {
+        font-size: 3.7em;
+        fill: #635F5D;
+      }
+
+      .dot {
+        margin: 0 5px 0px 10px;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .text {
+        line-height: 24px;
+        display: inline-block;
+      }
+
+      .legend {
+        display: flex;
+        align-items: center;
+      }
+      .line {
+          stroke: #E4002B;
+          fill: none;
+          stroke-width: 3;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha512-MoRNloxbStBcD8z3M/2BmnT+rg4IsMxPkXaGh2zD6LGNNFE80W3onsAhRcMAMrSoyWL9xD7Ert0men7vR8LUZg==" crossorigin="anonymous" />
+  </head>
+  <body>
+    <header>
+      <nav>
+      <ul>
+      <li>
+        <a href="0816169.html"> Home </a>
+      </li>
+      <li>
+      <a href="scatter_plot.html"> Scatter Plot </a>
+      </li>
+      <li>
+      <a href="histogram.html"> Histogram </a>
+      </li>
+      <li>
+      <a href="scatterplot_matrix.html"> Scatter Plot Matrix</a>
+      </li>
+      <li>
+      <a href="circular_bar.html"> Circular Barplot </a>
+      </li>
+      </ul>
+      </nav>
+    </header>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="row">
+            <!-- <br><p></p> -->
+            <br><font size="5">X axis:</font>
+            <select id = "attr_x" onchange = "change_genre()" >  
+              <option value="0"> popularity</option>
+              <option value="1"> duration_ms </option>  
+              <option value="2"> danceability </option>  
+              <option value="3"> energy </option>  
+              <option value="4"> key </option>
+              <option value="5"> loudness </option>
+              <option value="6"> mode </option>
+              <option value="7">speechiness</option>    
+              <option value="8">acousticness</option>
+              <option value="9">instrumentalness</option>
+              <option value="10">liveness</option>
+              <option value="11">valence</option>
+              <option value="12">tempo</option>
+              <option value="13">time_signature</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="row">
+            <div class="row">
+              <font size="5">Y axis:</font>
+              <select id = "attr_y" onchange = "change_genre()" >  
+                <option value="0"> popularity</option>
+                <option value="1"> duration_ms </option>  
+                <option value="2"> danceability </option>  
+                <option value="3"> energy </option>  
+                <option value="4"> key </option>
+                <option value="5"> loudness </option>
+                <option value="6"> mode </option>
+                <option value="7">speechiness</option>    
+                <option value="8">acousticness</option>
+                <option value="9">instrumentalness</option>
+                <option value="10">liveness</option>
+                <option value="11">valence</option>
+                <option value="12">tempo</option>
+                <option value="13">time_signature</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-12"><hr></div>
+        <div class="col-12">
+          <div class="d-flex">
+            <div class="legend">
+              <div class="dot Iris-setosa"></div>
+              <div id="class1"></div>
+            </div>
+            <div class="legend">
+              <div class="dot Iris-versicolor"></div>
+              <div id="class2"></div>
+            </div>
+            <div class="legend">
+              <div class="dot Iris-virginica"></div>
+              <div id="class3"></div>
+            </div>                    
+          </div>
+        </div>
+        <div id="chart" class="col-12"></div>
+      </div>
+    </div>
+    <script>
+      var data_all;
+      var data_tmp;
+      var regressiomnn;
+      // const dataName = ['sepal length', 'sepal width', 'petal length', 'petal width'];
+      const dataName = traits =  ["popularity","duration_ms","danceability","energy","key","loudness","mode","speechiness","acousticness","instrumentalness","liveness","valence","tempo","time_signature"];
+      const render = (data, xAsis, yAsis) => {
+        data.forEach(function(d) {
+            d[xAsis] = +d[xAsis]; // convert to number
+            d[yAsis] = +d[yAsis];
+        });
+        let width = parseInt(d3.select("#chart").style("width"), 10) - 20;
+        let height = 1000;
+        d3.select("#chart svg").remove();
+        const svg = d3
+          .select("#chart")
+          .append("svg")
+          .attr("height", height)
+          .attr("width", width);
+
+        const circleRadius = 10;
+
+        const xValue = d => d[xAsis];
+        const xAxisLabel = xAsis;
+        const yValue = d => d[yAsis];
+        const yAxisLabel = yAsis;
+        
+        const margin = { top: 60, right: 40, bottom: 88, left: 150 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        
+        // console.log(d3.extent(data, xValue))
+        const xScale = d3.scaleLinear()
+          .domain(d3.extent(data, xValue))
+          .range([0, innerWidth])
+          .nice();
+        
+        const yScale = d3.scaleLinear()
+          .domain(d3.extent(data, yValue))
+          .range([innerHeight, 0])
+          .nice();
+        
+        const g = svg.append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+        const xAxis = d3.axisBottom(xScale)
+          .tickSize(-innerHeight)
+          .tickPadding(15);
+        
+        const yAxis = d3.axisLeft(yScale)
+          .tickSize(-innerWidth)
+          .tickPadding(10);
+        
+        const yAxisG = g.append('g').call(yAxis);
+        yAxisG.selectAll('.domain').remove();
+        
+        yAxisG.append('text')
+            .attr('class', 'axis-label')
+            .attr('y', -93)
+            .attr('x', -innerHeight / 2)
+            .attr('fill', 'black')
+            .attr('transform', `rotate(-90)`)
+            .attr('text-anchor', 'middle')
+            .text(yAxisLabel);
+        
+        const xAxisG = g.append('g').call(xAxis)
+          .attr('transform', `translate(0,${innerHeight})`);
+        
+        xAxisG.select('.domain').remove();
+        
+        xAxisG.append('text')
+            .attr('class', 'axis-label')
+            .attr('y', 75)
+            .attr('x', innerWidth / 2)
+            .attr('fill', 'black')
+            .text(xAxisLabel);
+        var color = d3.scaleOrdinal(d3.schemeCategory10);
+        g.selectAll('circle').data(data)
+          .enter().append('circle')
+            // .attr('class', d => d.class)
+            .attr('cy', d => yScale(yValue(d)))
+            .attr('cx', d => xScale(xValue(d)))
+            .attr('r', circleRadius)
+            .style("opacity", 0.5) 
+            .style("fill", function(d) { return color(d.track_genre); })
+            .on('mouseover', function (d, i) {
+                d3.select(this).attr("r", 15).append('title').interrupt("fadeOut")
+                .text(function (d) { return d.track_genre +
+                      '\nartists: ' + d.artists +
+							        '\nalbum_name: ' + d.album_name+
+                      '\ntrack_name: ' + d.track_name+
+							        '\nX: ' + xValue(d) +
+							        '\nY: ' + yValue(d) });
+            })
+            .on('mouseout', function (d, i) {
+                d3.selectAll('title').remove().transition("fadeOut")
+                d3.select(this).attr("r", circleRadius);
+            })
+
+        
+      };
+
+      d3.csv('http://vis.lab.djosix.com:2020/data/spotify_tracks.csv', function(csv){
+          // csv = csv.slice(0,csv.length-1)
+          create_class_option(csv);
+          data_all = csv;
+          selectValue = d3.select('#class1 option:checked').text();
+          selectValue2 = d3.select('#class2 option:checked').text();
+          selectValue3 = d3.select('#class3 option:checked').text();
+          // console.log(selectValue)
+          filter_data1 = csv.filter(function(row) {
+                return row['track_genre'] == selectValue;
+            })
+          filter_data2 = csv.filter(function(row) {
+                return row['track_genre'] == selectValue2;
+            })
+          filter_data3 = csv.filter(function(row) {
+                return row['track_genre'] == selectValue3;
+            })
+          
+          Array.prototype.push.apply(filter_data1,filter_data2); 
+          Array.prototype.push.apply(filter_data1,filter_data3);
+
+          var attr_x = document.getElementById("attr_x");
+            var attr_y = document.getElementById("attr_y");
+            var x_value = attr_x.value;
+            var y_value = attr_y.value;
+          render(filter_data1, dataName[x_value], dataName[y_value]);
+          // render(csv, dataName[x_value], dataName[y_value]);
+          console.log(filter_data1);
+          data_tmp = filter_data1;
+        });
+
+      window.addEventListener('resize', () => { render(data, dataName[$('input[name="x-axis"]:checked').val()], dataName[$('input[name="y-axis"]:checked').val()]) });
+
+      function update_x(){
+        var attr_x = document.getElementById("attr_x");
+          var attr_y = document.getElementById("attr_y");
+          var x_value = attr_x.value;
+          var y_value = attr_y.value;
+          render(data_tmp, dataName[x_value], dataName[y_value]);
+      }
+
+      function update_y(){
+        var attr_x = document.getElementById("attr_x");
+          var attr_y = document.getElementById("attr_y");
+          var x_value = attr_x.value;
+          var y_value = attr_y.value;
+          render(data_tmp, dataName[x_value], dataName[y_value]);
+      }
+      function change_genre() {
+        selectValue = d3.select('#class1 option:checked').text();
+        selectValue2 = d3.select('#class2 option:checked').text();
+        selectValue3 = d3.select('#class3 option:checked').text();
+        // console.log(selectValue)
+        filter_data1 = data_all.filter(function(row) {
+              return row['track_genre'] == selectValue;
+          })
+        console.log(filter_data1)
+        filter_data2 = data_all.filter(function(row) {
+              return row['track_genre'] == selectValue2;
+          })
+        filter_data3 = data_all.filter(function(row) {
+              return row['track_genre'] == selectValue3;
+          })
+        
+        Array.prototype.push.apply(filter_data1,filter_data2); 
+        Array.prototype.push.apply(filter_data1,filter_data3);
+
+        var attr_x = document.getElementById("attr_x");
+          var attr_y = document.getElementById("attr_y");
+          var x_value = attr_x.value;
+          var y_value = attr_y.value;
+        data_tmp = filter_data1;
+        // console.log(data);
+        render(filter_data1, dataName[x_value], dataName[y_value]);
+        
+      };
+      function create_class_option(csv){
+          var select = d3.select("#class1")
+            .append('select')
+              .attr('class','select')
+              .on('change',change_genre)
+          var options = select
+            .selectAll('option')
+            .data(d3.map(csv, function(d){return d.track_genre;}).keys()).enter()
+            .append('option')
+              .text(function (d) { return d; })
+          
+          var select2 = d3.select("#class2")
+            .append('select')
+              .attr('class','select')
+              .on('change',change_genre)
+          var options2 = select2
+            .selectAll('option')
+            .data(d3.map(csv, function(d){return d.track_genre;}).keys()).enter()
+            .append('option')
+              .text(function (d) { return d; })
+          options2.property("selected", function(d){ return d === "afrobeat"; })
+          var select3 = d3.select("#class3")
+            .append('select')
+              .attr('class','select')
+              .on('change',change_genre)
+          var options3 = select3
+            .selectAll('option')
+            .data(d3.map(csv, function(d){return d.track_genre;}).keys()).enter()
+            .append('option')
+              .text(function (d) { return d; })
+          options3.property("selected", function(d){ return d === "alt-rock"; })
+      }
+      async function leastSquaresequation(XaxisData, Yaxisdata) {
+          var ReduceAddition =  await function(prev, cur) { return prev + cur; };
+          
+          // finding the mean of Xaxis and Yaxis data
+          var xBar = XaxisData.reduce(ReduceAddition) * 1.0 / XaxisData.length;
+          var yBar = Yaxisdata.reduce(ReduceAddition) * 1.0 / Yaxisdata.length;
+
+          var SquareXX = XaxisData.map(function(d) { return Math.pow(d - xBar, 2); })
+            .reduce(ReduceAddition);
+          
+          var ssYY = Yaxisdata.map(function(d) { return Math.pow(d - yBar, 2); })
+            .reduce(ReduceAddition);
+            
+          var MeanDiffXY = XaxisData.map(function(d, i) { return (d - xBar) * (Yaxisdata[i] - yBar); })
+            .reduce(ReduceAddition);
+            
+          var slope = MeanDiffXY / SquareXX;
+          var intercept = yBar - (xBar * slope);
+          
+      // returning regression function
+          return function(x){
+            return x*slope+intercept
+          }
+      }
+    </script>
+  </body>
+</html>

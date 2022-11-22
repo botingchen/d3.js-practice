@@ -1,27 +1,77 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-  <title>Iris Scatter Plot</title>
+  <title>Circular Barplot</title>
   <!-- Load d3.js -->
   <script src="https://d3js.org/d3.v4.js"></script>
 
   <!-- Function for radial charts -->
   <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3-scale-radial.js"></script>
+  <style type=text/css>
+    body 
+    {
+    height: 125vh;
+    margin-top: 80px;
+    padding: 30px;
+    background-size: cover;
+    font-family: sans-serif;
+    }
+    header {
+    background-color: orange;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 5px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 0 25px 0 black;
+    }
+    header * {
+    display: inline;
+    }
+    header li {
+    margin: 20px;
+    }
+    header li a {
+    color: blue;
+    text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-
+    <header>
+    <nav>
+    <ul>
+      <li>
+        <a href="0816169.html"> Home </a>
+        </li>
+        <li>
+        <a href="scatter_plot.html"> Scatter Plot </a>
+        </li>
+        <li>
+        <a href="histogram.html"> Histogram </a>
+        </li>
+        <li>
+        <a href="scatterplot_matrix.html"> Scatter Plot Matrix</a>
+        </li>
+        <li>
+        <a href="circular_bar.html"> Circular Barplot </a>
+        </li>
+    </ul>
+    </nav>
+    </header>
 
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz">
   <div style = "display: inline-block;">
-    <font size="5">Numeric Attribute:</font>
+    <font size="5">Display average value of:</font>
     <select id = "attributeList" onchange = "update()" >  
       <option value="popularity"> popularity</option>
       <option value="duration_ms"> duration_ms </option>  
       <option value="danceability"> danceability </option>  
       <option value="energy"> energy </option>  
       <option value="key"> key </option>
-      <option value="loudness"> loudness </option>
       <option value="mode"> mode </option>
       <option value="speechiness">speechiness</option>    
       <option value="acousticness">acousticness</option>
@@ -31,6 +81,7 @@
       <option value="tempo">tempo</option>
       <option value="time_signature">time_signature</option>
     </select>
+    <font size="5">in different track genre</font>
   </div>
 </div>
 <script>
